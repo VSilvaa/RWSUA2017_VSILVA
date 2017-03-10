@@ -36,7 +36,7 @@ namespace rwsua2017
 	    MyPlayer(string argin_name, string argin_team_name): Player(argin_name,argin_team_name)
 	    {
 
-		sub = n.subscribe("/make_a_play", 1000, &MyPlayer::make_plays_callback,this);
+		sub = n.subscribe("/make_a_play/cat", 1000, &MyPlayer::make_plays_callback,this);
 
 		  t1.setOrigin( tf::Vector3(0.5, 2, 0.0) );
 		  tf::Quaternion q;
@@ -58,8 +58,8 @@ namespace rwsua2017
 
 	  Transform t_mov;
 
-	  float turn_angle=M_PI/10;
-	  float displacement=0.5;
+	  float turn_angle=M_PI/30;
+	  float displacement=msg->max_displacement;
 
 	  
 	  t_mov.setOrigin( tf::Vector3(displacement, 0, 0.0) );
