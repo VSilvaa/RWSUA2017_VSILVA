@@ -12,11 +12,21 @@
 #include <rwsua2017_libs/player.h>
 #include <rwsua2017_msgs/MakeAPlay.h>
 #include <tf/transform_broadcaster.h>
+#include <tf/transform_listener.h>
 
                          
 using namespace std;
 using namespace boost;
 using namespace tf;
+
+double randNumber(){
+	struct timeval t1;
+	gettimeofday(&t1,NULL);
+	srand(t1.tv_usec);
+	double x =((((double)rand()/(double)RAND_MAX)*2 -1)*5);
+
+	return x;
+}
 
                                                          
 namespace rwsua2017
@@ -27,6 +37,7 @@ namespace rwsua2017
 	{
 		ros::Subscriber sub;
 		tf::TransformBroadcaster br;
+		tf::TransformListener listener;
 		tf::Transform t1;
 
 	    public: 
@@ -38,7 +49,7 @@ namespace rwsua2017
 
 		sub = n.subscribe("/make_a_play/cat", 1000, &MyPlayer::make_plays_callback,this);
 
-		  t1.setOrigin( tf::Vector3(0.5, 2, 0.0) );
+		  t1.setOrigin( tf::Vector3(randNumber(), randNumber(), 0.0) );
 		  tf::Quaternion q;
 		  q.setRPY(0, 0, 0);
 		  t1.setRotation(q);
@@ -51,15 +62,37 @@ namespace rwsua2017
 
 		vector<string> teammates;
 
+
+
+	float getAnleto(string player_name)
+	{
+		tf::StampedTransform transf;
+
+	    try{
+	      listener.lookupTransform(name, player_name, ros::Time(0), transf);
+	    }
+	    catch (tf::TransformException ex){
+	      ROS_ERROR("%s",ex.what());
+	      ros::Duration(1.0).sleep();
+	    }
+
+	    float ang =  atan2(transf.getOrigin().y(),transf.getOrigin().x());
+
+	return ang;
+
+	}
+
+
+
 	void make_plays_callback(const rwsua2017_msgs::MakeAPlay::ConstPtr& msg)
 	{
-
 	  cout << "Coiso!! with max disp.= "<< msg->max_displacement << endl;
 
 	  Transform t_mov;
 
-	  float turn_angle=M_PI/30;
+	  float turn_angle=getAnleto("jsousa");
 	  float displacement=msg->max_displacement;
+	  TransformListener listener;
 
 	  
 	  t_mov.setOrigin( tf::Vector3(displacement, 0, 0.0) );
@@ -69,9 +102,6 @@ namespace rwsua2017
 	  Transform t=t1*t_mov;
 	  br.sendTransform(tf::StampedTransform(t, ros::Time::now(), "map",name));
 	  t1=t;
-	  
-
-
 	}
 
 
