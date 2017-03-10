@@ -11,10 +11,13 @@
 #include <ros/ros.h>
 #include <rwsua2017_libs/player.h>
 #include <rwsua2017_msgs/MakeAPlay.h>
+#include <tf/transform_broadcaster.h>
 
                          
 using namespace std;
 using namespace boost;
+using namespace tf;
+
                                                          
 namespace rwsua2017
 {
@@ -23,6 +26,9 @@ namespace rwsua2017
 	class MyPlayer:public Player
 	{
 		ros::Subscriber sub;
+		tf::TransformBroadcaster br;
+		tf::Transform t1;
+
 	    public: 
 		
 
@@ -32,6 +38,13 @@ namespace rwsua2017
 
 		sub = n.subscribe("/make_a_play", 1000, &MyPlayer::make_plays_callback,this);
 
+		  t1.setOrigin( tf::Vector3(0.5, 2, 0.0) );
+		  tf::Quaternion q;
+		  q.setRPY(0, 0, 0);
+		  t1.setRotation(q);
+		  br.sendTransform(tf::StampedTransform(t1, ros::Time::now(), "map",name));
+
+
 		//setTeamName(team);
 		cout << "MyPlayer" << endl;
 	    }
@@ -40,7 +53,25 @@ namespace rwsua2017
 
 	void make_plays_callback(const rwsua2017_msgs::MakeAPlay::ConstPtr& msg)
 	{
+
 	  cout << "Coiso!! with max disp.= "<< msg->max_displacement << endl;
+
+	  Transform t_mov;
+
+	  float turn_angle=M_PI/10;
+	  float displacement=0.5;
+
+	  
+	  t_mov.setOrigin( tf::Vector3(displacement, 0, 0.0) );
+	  Quaternion q;
+	  q.setRPY(0, 0, turn_angle);
+	  t_mov.setRotation(q);
+	  Transform t=t1*t_mov;
+	  br.sendTransform(tf::StampedTransform(t, ros::Time::now(), "map",name));
+	  t1=t;
+	  
+
+
 	}
 
 
@@ -66,7 +97,7 @@ int main(int argc, char **argv)
 
 	for(size_t i=0;i<myplayer.teammates.size();++i)
 	{
-		cout << myplayer.teammates[i] << endl;
+		//cout << myplayer.teammates[i] << endl;
 	}
 	
 	ros::spin();
