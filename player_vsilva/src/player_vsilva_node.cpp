@@ -180,7 +180,7 @@ bool checkLimits(){
 					}
 			}
 
-			int safedist = 1.8;
+			int safedist = 2;
 			double angleC;
 			if(mindistH < safedist){
 					if(msg->green_alive.size() > 0){
@@ -192,7 +192,7 @@ bool checkLimits(){
 					}
 
 					if(checkLimits()){
-						angleC = M_PI/40;
+						angleC = M_PI/80;
 					}
 
 			}else{
