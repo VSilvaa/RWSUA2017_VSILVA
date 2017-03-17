@@ -70,13 +70,13 @@ namespace rwsua2017
 
 
 //---------------------------------------------------------------------------------------
-float getAngleTo(string player_name)
+float getAngleFromTo(string namee, string player_name)
 	   {
 		tf::StampedTransform trans;
 		ros::Time now = Time(0); //get the latest transform received
 		try{
-			listener.waitForTransform(name,player_name,now,Duration(0.1));
-			listener.lookupTransform(name, player_name,now, trans);
+			listener.waitForTransform(namee,player_name,now,Duration(0.1));
+			listener.lookupTransform(namee, player_name,now, trans);
 		}
 		catch (tf::TransformException &ex) {
 		ROS_ERROR("%s",ex.what());
@@ -85,6 +85,7 @@ float getAngleTo(string player_name)
 		float x = trans.getOrigin().x();
 		float y = trans.getOrigin().y();
 		double angle = atan2(y,x);
+		return angle;
 	   }
 //---------------------------------------------------------------------------------------
 	tf::StampedTransform getPose(void)
@@ -136,28 +137,47 @@ double getDistFromTo(string from, string to){
 		// Definição dos angulos de rotação e valores de translação
 
 
-		float displacement=msg->max_displacement;
+		float displacement = msg->max_displacement;
 
+			
 
 			double dist[3];
-
-			dist[0] = getDistFromTo(name, "rmartins");
-			dist[1] = getDistFromTo(name, "jferreira");
-			dist[2] = getDistFromTo(name, "fsilva");
-
-			int safedist = 2;
-			double angleC;
-			if(dist[0] < safedist || dist[1] < safedist || dist[2] < safedist){
-				if(dist[0] < safedist){
-					angleC = -getAngleTo("rmartins");
-				}else if(dist[1] < safedist){
-					angleC = -getAngleTo("jferreira");
-				}else{
-						angleC = -getAngleTo("fsilva");
-				}
-			}else{
-				angleC = getAngleTo("moliveira");
+			double mindistH = 100000;
+			int idxH = 0;
+			for(int i = 0; i< msg->green_alive.size();i++){
+				dist[i] = getDistFromTo(name, msg->green_alive[i]);
+				if(dist[i] < mindistH){
+							mindistH = dist[i];
+							idxH = i;
+					}
 			}
+
+			int safedist = 1.2;
+			double angleC;
+			if(mindistH < safedist){
+					if(msg->green_alive.size() > 0){
+						angleC = -getAngleFromTo(name,msg->green_alive[idxH]);
+					}else{
+						angleC = MAX_ANGLE;
+					}
+			}else{
+				double mindist = 1000000;
+				int idx = 0;
+				for(int i = 0; i< msg->red_alive.size();i++){
+					double dis = getDistFromTo(name, msg->red_alive[i]);
+					if(dis < mindist){
+							mindist = dis;
+							idx = i;
+					}
+				}
+			
+				if(msg->red_alive.size() > 0){
+					angleC = getAngleFromTo(name,msg->red_alive[idx]);
+					}else{
+						angleC = MAX_ANGLE;
+					}
+			}
+
 
 			move(displacement, angleC, MAX_ANGLE);
 
