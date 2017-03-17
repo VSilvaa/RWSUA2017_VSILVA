@@ -32,6 +32,8 @@ double randNumber(){
 	return x;
 }
 
+double incang =0;
+
                                                          
 namespace rwsua2017
 {
@@ -129,6 +131,36 @@ double getDistFromTo(string from, string to){
 }
 
 //---------------------------------------------------------------------------------------
+
+bool checkLimits(){
+
+	tf::StampedTransform transform;
+	ros::Time now = ros::Time(0);
+	float time_to_wait = 0.1;
+	double dist = 0;
+	 try{
+			listener.waitForTransform("/map",name,now, ros::Duration(time_to_wait));
+     listener.lookupTransform("/map", name,
+															now,transform);
+    }
+    catch (tf::TransformException ex){
+      ROS_ERROR("%s",ex.what());
+      //ros::Duration(1.0).sleep();
+    }
+
+
+		double x = transform.getOrigin().x();
+    double y = transform.getOrigin().y();
+
+		double safedist = 1.5;
+
+		if(abs(x) > 5-safedist  ||  abs(y) > 5-safedist){
+				return true;
+		}
+		return false;
+
+}
+//---------------------------------------------------------------------------------------
 	void make_plays_callback(const rwsua2017_msgs::MakeAPlay::ConstPtr& msg)
 	{	  
 		cout << "I received a MakeAPlay message" << endl;
@@ -152,14 +184,21 @@ double getDistFromTo(string from, string to){
 					}
 			}
 
-			int safedist = 1.2;
+			int safedist = 1.8;
 			double angleC;
 			if(mindistH < safedist){
 					if(msg->green_alive.size() > 0){
-						angleC = -getAngleFromTo(name,msg->green_alive[idxH]);
+						angleC = -getAngleFromTo(name,msg->green_alive[idxH]) + incang;
+						angleC += M_PI/10;
+						
 					}else{
 						angleC = MAX_ANGLE;
 					}
+
+					if(checkLimits()){
+						angleC = M_PI/40;
+					}
+
 			}else{
 				double mindist = 1000000;
 				int idx = 0;
@@ -209,9 +248,6 @@ double getDistFromTo(string from, string to){
 			//only if using a MESH_RESOURCE marker type:
 			marker.mesh_resource = "package://pr2_description/meshes/base_v0/base.dae";
 			vis_pub.publish( marker );
-
-
-
 
 	}
 
