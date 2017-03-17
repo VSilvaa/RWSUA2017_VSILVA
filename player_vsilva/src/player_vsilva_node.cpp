@@ -262,9 +262,10 @@ bool checkLimits(){
 	  TransformListener listener;
 
 	  t1=getPose();
+	
 
 	  
-	  t_mov.setOrigin( tf::Vector3(displacement*1.2, 0, 0.0) );
+	  t_mov.setOrigin( tf::Vector3(displacement, 0, 0.0) );
 	  Quaternion q;
 	  q.setRPY(0, 0, turn_angle);
 	  t_mov.setRotation(q);
