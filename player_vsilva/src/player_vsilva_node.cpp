@@ -14,7 +14,7 @@
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
 
-#define MAX_ANGLE M_PI/3
+#define MAX_ANGLE M_PI/30
 
                          
 using namespace std;
@@ -104,22 +104,19 @@ namespace rwsua2017
 
 //---------------------------------------------------------------------------------------
 	void make_plays_callback(const rwsua2017_msgs::MakeAPlay::ConstPtr& msg)
-	{
-
-	  
+	{	  
 
 	  float turn_angle=getAnleto("moliveira");
-
-
-
 	  float displacement=msg->max_displacement;
+
 	  move(displacement ,turn_angle ,MAX_ANGLE);
 
 	}
-	
+//---------------------------------------------------------------------------------------	
 	void move(float displacement , float turn_angle , float max_turn_angle)
 	{
           Transform t_mov;
+
 	  if(turn_angle > max_turn_angle) turn_angle= max_turn_angle;
 	  else if(turn_angle < -max_turn_angle) turn_angle= -max_turn_angle;
 
