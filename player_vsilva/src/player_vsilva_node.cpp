@@ -14,6 +14,8 @@
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
 
+#define MAX_ANGLE M_PI/3
+
                          
 using namespace std;
 using namespace boost;
@@ -44,7 +46,7 @@ namespace rwsua2017
 	    public: 
 		
 
-
+//---------------------------------------------------------------------------------------
 	    MyPlayer(string argin_name, string argin_team_name): Player(argin_name,argin_team_name)
 	    {
 
@@ -64,10 +66,10 @@ namespace rwsua2017
 		vector<string> teammates;
 
 
-
+//---------------------------------------------------------------------------------------
 	float getAnleto(string player_name)
 	{
-		tf::StampedTransform transf;
+	    tf::StampedTransform transf;
 
 	    try{
 	      listener.waitForTransform(name,player_name,ros::Time(0), Duration(0.1));
@@ -80,10 +82,10 @@ namespace rwsua2017
 
 	    float ang =  atan2(transf.getOrigin().y(),transf.getOrigin().x());
 
-	return ang;
+	    return ang;
 
 	}
-
+//---------------------------------------------------------------------------------------
 	tf::StampedTransform getPose(void)
 	{
 	    tf::StampedTransform transf;
@@ -96,22 +98,34 @@ namespace rwsua2017
 	      ros::Duration(1.0).sleep();
 	    }
 
-		return transf;
+	    return transf;
 	}
 
 
-
+//---------------------------------------------------------------------------------------
 	void make_plays_callback(const rwsua2017_msgs::MakeAPlay::ConstPtr& msg)
 	{
-	  cout << "Coiso!! with max disp.= "<< msg->max_displacement << endl;
 
-	  Transform t_mov;
+	  
 
 	  float turn_angle=getAnleto("moliveira");
+
+
+
 	  float displacement=msg->max_displacement;
+	  move(displacement ,turn_angle ,MAX_ANGLE);
+
+	}
+	
+	void move(float displacement , float turn_angle , float max_turn_angle)
+	{
+          Transform t_mov;
+	  if(turn_angle > max_turn_angle) turn_angle= max_turn_angle;
+	  else if(turn_angle < -max_turn_angle) turn_angle= -max_turn_angle;
+
 	  TransformListener listener;
 
-	t1=getPose();
+	  t1=getPose();
 
 	  
 	  t_mov.setOrigin( tf::Vector3(displacement, 0, 0.0) );
@@ -120,13 +134,14 @@ namespace rwsua2017
 	  t_mov.setRotation(q);
 	  Transform t=t1*t_mov;
 	  br.sendTransform(tf::StampedTransform(t, ros::Time::now(), "map",name));
+
 	}
 
 
 	};
 
 }
-
+//---------------------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
 
