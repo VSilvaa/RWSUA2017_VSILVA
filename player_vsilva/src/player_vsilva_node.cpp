@@ -82,6 +82,20 @@ namespace rwsua2017
 
 	}
 
+	tf::StampedTransform getPose(void)
+	{
+	    tf::StampedTransform transf;
+	    try{
+	      listener.lookupTransform("map", name, ros::Time(0), transf);
+	    }
+	    catch (tf::TransformException ex){
+	      ROS_ERROR("%s",ex.what());
+	      ros::Duration(1.0).sleep();
+	    }
+
+		return transf;
+	}
+
 
 
 	void make_plays_callback(const rwsua2017_msgs::MakeAPlay::ConstPtr& msg)
@@ -90,9 +104,11 @@ namespace rwsua2017
 
 	  Transform t_mov;
 
-	  float turn_angle=getAnleto("jsousa");
+	  float turn_angle=getAnleto("jferreira");
 	  float displacement=msg->max_displacement;
 	  TransformListener listener;
+
+	t1=getPose();
 
 	  
 	  t_mov.setOrigin( tf::Vector3(displacement, 0, 0.0) );
@@ -121,8 +137,8 @@ int main(int argc, char **argv)
 	cout << "Created an instance of class player with public name " << myplayer.name << endl;
 	cout << "Team_name = " << myplayer.get_team_name() << endl;
 
-	myplayer.teammates.push_back("vsilva");
-	myplayer.teammates.push_back("fsilva");
+	myplayer.teammates.push_back("dcorreia");
+	myplayer.teammates.push_back("jsousa");
 
 
 	for(size_t i=0;i<myplayer.teammates.size();++i)
