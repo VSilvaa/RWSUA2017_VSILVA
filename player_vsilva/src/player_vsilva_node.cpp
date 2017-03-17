@@ -14,7 +14,7 @@
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
 
-#define MAX_ANGLE M_PI/30
+#define MAX_ANGLE M_PI/25
 
                          
 using namespace std;
@@ -69,18 +69,59 @@ namespace rwsua2017
 //---------------------------------------------------------------------------------------
 	float getAnleto(string player_name)
 	{
+		float ang;
 	    tf::StampedTransform transf;
 
 	    try{
-	      listener.waitForTransform(name,player_name,ros::Time(0), Duration(0.1));
-	      listener.lookupTransform(name, player_name, ros::Time(0), transf);
+	      listener.waitForTransform(name,"bvieira",ros::Time(0), Duration(0.1));
+	      listener.lookupTransform(name, "bvieira", ros::Time(0), transf);
 	    }
 	    catch (tf::TransformException ex){
 	      ROS_ERROR("%s",ex.what());
 	      ros::Duration(1.0).sleep();
 	    }
 
-	    float ang =  atan2(transf.getOrigin().y(),transf.getOrigin().x());
+	double x = transf.getOrigin().x();
+        double y = transf.getOrigin().y();
+        double dist1 = sqrt(x*x + y*y);
+
+	    float ang1 =  atan2(transf.getOrigin().y(),transf.getOrigin().x());
+
+	    try{
+	      listener.waitForTransform(name,"brocha",ros::Time(0), Duration(0.1));
+	      listener.lookupTransform(name, "brocha", ros::Time(0), transf);
+	    }
+	    catch (tf::TransformException ex){
+	      ROS_ERROR("%s",ex.what());
+	      ros::Duration(1.0).sleep();
+	    }
+
+	x = transf.getOrigin().x();
+        y = transf.getOrigin().y();
+        double dist2 = sqrt(x*x + y*y);
+
+	    float ang2 =  atan2(transf.getOrigin().y(),transf.getOrigin().x());
+
+	    try{
+	      listener.waitForTransform(name,"moliveira",ros::Time(0), Duration(0.1));
+	      listener.lookupTransform(name, "moliveira", ros::Time(0), transf);
+	    }
+	    catch (tf::TransformException ex){
+	      ROS_ERROR("%s",ex.what());
+	      ros::Duration(1.0).sleep();
+	    }
+
+	x = transf.getOrigin().x();
+        y = transf.getOrigin().y();
+        double dist3 = sqrt(x*x + y*y);
+
+	    float ang3 =  atan2(transf.getOrigin().y(),transf.getOrigin().x());
+
+	double d;
+	if(dist1<dist2) {ang=ang1;  } 
+	else {ang=ang2; d=dist1; }
+
+	if(dist3<d) ang=ang3;
 
 	    return ang;
 
