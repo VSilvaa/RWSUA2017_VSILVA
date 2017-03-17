@@ -147,7 +147,7 @@ bool checkLimits(){
 
 
 		double x = transform.getOrigin().x();
-    double y = transform.getOrigin().y();
+    		double y = transform.getOrigin().y();
 
 		double safedist = 1.5;
 
