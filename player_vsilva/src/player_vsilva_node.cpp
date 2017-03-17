@@ -18,6 +18,7 @@
 using namespace std;
 using namespace boost;
 using namespace tf;
+using namespace ros;
 
 double randNumber(){
 	struct timeval t1;
@@ -69,6 +70,7 @@ namespace rwsua2017
 		tf::StampedTransform transf;
 
 	    try{
+	      listener.waitForTransform(name,player_name,ros::Time(0), Duration(0.1));
 	      listener.lookupTransform(name, player_name, ros::Time(0), transf);
 	    }
 	    catch (tf::TransformException ex){
@@ -86,6 +88,7 @@ namespace rwsua2017
 	{
 	    tf::StampedTransform transf;
 	    try{
+	      listener.waitForTransform("map",name,ros::Time(0), Duration(0.1));
 	      listener.lookupTransform("map", name, ros::Time(0), transf);
 	    }
 	    catch (tf::TransformException ex){
@@ -104,7 +107,7 @@ namespace rwsua2017
 
 	  Transform t_mov;
 
-	  float turn_angle=getAnleto("jferreira");
+	  float turn_angle=getAnleto("moliveira");
 	  float displacement=msg->max_displacement;
 	  TransformListener listener;
 
@@ -117,7 +120,6 @@ namespace rwsua2017
 	  t_mov.setRotation(q);
 	  Transform t=t1*t_mov;
 	  br.sendTransform(tf::StampedTransform(t, ros::Time::now(), "map",name));
-	  t1=t;
 	}
 
 
