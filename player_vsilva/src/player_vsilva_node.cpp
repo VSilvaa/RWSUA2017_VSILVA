@@ -63,9 +63,6 @@ namespace rwsua2017
 		  t1.setRotation(q);
 		  br.sendTransform(tf::StampedTransform(t1, ros::Time::now(), "map",name));
 
-
-		//setTeamName(team);
-		cout << "MyPlayer" << endl;
 	    }
 
 		vector<string> teammates;
@@ -163,8 +160,7 @@ bool checkLimits(){
 //---------------------------------------------------------------------------------------
 	void make_plays_callback(const rwsua2017_msgs::MakeAPlay::ConstPtr& msg)
 	{	  
-		cout << "I received a MakeAPlay message" << endl;
-		cout << "max_displacement = " << msg->max_displacement << endl;
+		ROS_INFO_STREAM("|||||||||| <3 BLUE TEAM <3 |||||||||||" << endl);
 
 		// Definição dos angulos de rotação e valores de translação
 
@@ -288,8 +284,7 @@ int main(int argc, char **argv)
     //Creating an instance of class Player
     rwsua2017::MyPlayer myplayer(player_name,"green");
 
-	cout << "Created an instance of class player with public name " << myplayer.name << endl;
-	cout << "Team_name = " << myplayer.get_team_name() << endl;
+	ROS_INFO_STREAM("||||||||||||||||||||| - BLUE TEAM - ||||||||||||||||||||" << endl);
 
 	myplayer.teammates.push_back("dcorreia");
 	myplayer.teammates.push_back("jsousa");
